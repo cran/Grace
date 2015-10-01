@@ -50,7 +50,7 @@ grace <- function(Y, X, L, lambda.L, lambda.L2 = 0, normalize.L = FALSE, test = 
 
     teststat <- betahat + bias   # Bias corrected test statistic
     Tstat <- (abs(teststat) - correct) * (abs(teststat) > correct)
-    pval <- 2 * (1 - pnorm(abs(Tstat)))
+    pval <- 2 * (1 - pnorm(abs(Tstat / se)))
 
     return(list(intercept = truealphahat, beta = truebetahat, pvalue = pval))
   }else{

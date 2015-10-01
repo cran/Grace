@@ -1,8 +1,8 @@
 Package: Grace
 Type: Package
 Title: Graph-Constrained Estimation and Hypothesis Testing
-Version: 0.1
-Date: 2015-08-08
+Version: 0.1.1
+Date: 2015-09-30
 Author: Sen Zhao
 Maintainer: Sen Zhao <senz@uw.edu>
 Description: Use the graph-constrained estimation (Grace) procedure to estimate graph-guided linear regression coefficients and use the Grace and GraceR tests to perform graph-guided hypothesis test on the association between the response and the predictor.
@@ -11,6 +11,6 @@ Depends: glmnet, scalreg
 Suggests: gelnet, penalized
 LazyData: TRUE
 NeedsCompilation: no
-Packaged: 2015-08-18 19:57:29 UTC; senzhao
+Packaged: 2015-09-30 23:00:22 UTC; zhaosen
 Repository: CRAN
-Date/Publication: 2015-08-19 00:22:25
+Date/Publication: 2015-10-01 23:18:59

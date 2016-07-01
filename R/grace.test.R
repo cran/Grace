@@ -3,8 +3,14 @@
 # Email: sendavid7@gmail.com
 
 grace.test <- function(Y, X, L, lambda.L, lambda.2 = 0, normalize.L = FALSE, eta = 0.05, C = 4 * sqrt(3), K = 10){
+  lambda.L <- unique(sort(lambda.L, decreasing = TRUE))
+  lambda.2 <- unique(sort(lambda.2, decreasing = TRUE))
+  
   ori.Y <- Y
   ori.X <- X
+  if(!is.null(ncol(c(1, 1)))){
+    stop("Error: Y must be a vector.")
+  }
   if(length(Y) != nrow(X)){
     stop("Error: Dimensions of X and Y must match.")
   }
@@ -32,9 +38,9 @@ grace.test <- function(Y, X, L, lambda.L, lambda.2 = 0, normalize.L = FALSE, eta
     L <- diag(1 / sqrt(diag(L))) %*% L %*% diag(1 / sqrt(diag(L)))  # Normalize L
   }
   
-  # If the more than one tuning parameter is provided, perform K-fold cross-validation  
+  # If more than one tuning parameter is provided, perform K-fold cross-validation  
   if((length(lambda.L) > 1) | (length(lambda.2) > 1)){
-    tun <- cvGrace(X, Y, L, lambda.L, 0, lambda.2)
+    tun <- cvGrace(X, Y, L, lambda.L, 0, lambda.2, K = K)
     lambda.L <- tun[1]
     lambda.2 <- tun[3]
   }

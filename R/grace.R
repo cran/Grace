@@ -3,8 +3,15 @@
 # Email: sendavid7@gmail.com
 
 grace <- function(Y, X, L, lambda.L, lambda.1 = 0, lambda.2 = 0, normalize.L = FALSE, K = 10){
+  lambda.L <- unique(sort(lambda.L, decreasing = TRUE))
+  lambda.1 <- unique(sort(lambda.1, decreasing = TRUE))
+  lambda.2 <- unique(sort(lambda.2, decreasing = TRUE))
+
   ori.Y <- Y
   ori.X <- X
+  if(!is.null(ncol(c(1, 1)))){
+    stop("Error: Y must be a vector.")
+  }
   if(length(Y) != nrow(X)){
     stop("Error: Dimensions of X and Y must match.")
   }
@@ -39,7 +46,7 @@ grace <- function(Y, X, L, lambda.L, lambda.1 = 0, lambda.2 = 0, normalize.L = F
   }
   
 
-  # If the more than one tuning parameter is provided, perform K-fold cross-validation  
+  # If more than one tuning parameter is provided, perform K-fold cross-validation  
   if((length(lambda.L) > 1) | (length(lambda.1) > 1) | (length(lambda.2) > 1)){
     tun <- cvGrace(X, Y, L, lambda.L, lambda.1, lambda.2, K)
     lambda.L <- tun[1]
@@ -47,6 +54,7 @@ grace <- function(Y, X, L, lambda.L, lambda.1 = 0, lambda.2 = 0, normalize.L = F
     lambda.2 <- tun[3]  
   }
   
+  # See Li & Li (2008) for reference
   Lnew <- lambda.L * L + lambda.2 * diag(p)
   S <- eigen(Lnew)$vectors %*% sqrt(diag(eigen(Lnew)$values))
   l2star <- 1

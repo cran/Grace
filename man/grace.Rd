@@ -81,7 +81,7 @@ Sigma <- solve(L + 0.1 * diag(p))
 sigma.error <- sqrt(t(beta) \%*\% Sigma \%*\% beta) / 10
 
 X <- mvrnorm(n, mu = rep(0, p), Sigma = Sigma)
-Y <- X \%*\% beta + rnorm(n, sd = sigma.error)
+Y <- c(X \%*\% beta + rnorm(n, sd = sigma.error))
 
-grace(Y, X, L, lambda.L = 100)
+grace(Y, X, L, lambda.L = 100, lambda.2 = 1)
 }

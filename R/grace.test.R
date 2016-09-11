@@ -8,24 +8,25 @@ grace.test <- function(Y, X, L, lambda.L, lambda.2 = 0, normalize.L = FALSE, eta
   
   ori.Y <- Y
   ori.X <- X
-  if(!is.null(ncol(c(1, 1)))){
-    stop("Error: Y must be a vector.")
+  if(!is.null(ncol(Y))){
+    stop("Error: Y is not a vector.")
   }
   if(length(Y) != nrow(X)){
-    stop("Error: Dimensions of X and Y must match.")
+    stop("Error: Dimensions of X and Y do not match.")
   }
   if(!isSymmetric(L)){
-    stop("Error: L must be a symmetric matrix.")
+    stop("Error: L is not a symmetric matrix.")
   }
   if(ncol(X) != ncol(L)){
-    stop("Error: Dimensions of X and L must match.")
+    stop("Error: Dimensions of X and L do not match.")
   }
   if(min(lambda.L) < 0 | min(lambda.2) < 0){
     stop("Error: Grace tuning parameters must be non-negative.")
   }
-  if(min(lambda.L) <= 0 & min(lambda.2) <= 0){
+  if(min(lambda.L) == 0 & min(lambda.2) == 0){
     stop("Error: At least one of the grace tuning parameters must be positive.")
   }
+  
   
   Y <- Y - mean(Y)  # Center Y
   n <- nrow(X)
@@ -38,17 +39,16 @@ grace.test <- function(Y, X, L, lambda.L, lambda.2 = 0, normalize.L = FALSE, eta
     L <- diag(1 / sqrt(diag(L))) %*% L %*% diag(1 / sqrt(diag(L)))  # Normalize L
   }
   
+  emin <- min(eigen(min(lambda.L) * L + min(lambda.2) * diag(p))$values)  # Minimum eigenvalue of the penalty weight matrix
+  if(emin < 1e-5){
+    stop("Error: The penalty matrix (lambda.L * L + lambda.2 * I) is not always positive definite for all tuning parameters. Consider increase the value of lambda.2.")
+  }
+  
   # If more than one tuning parameter is provided, perform K-fold cross-validation  
   if((length(lambda.L) > 1) | (length(lambda.2) > 1)){
     tun <- cvGrace(X, Y, L, lambda.L, 0, lambda.2, K = K)
     lambda.L <- tun[1]
     lambda.2 <- tun[3]
-  }
-  
-  emin <- min(eigen(lambda.L * L + lambda.2 * diag(p))$values)  # Minimum eigenvalue of the penalty weight matrix
-  if(emin < 1e-5){
-    lambda.2 <- 1e-5 - emin
-    warning(paste("Warning: The penalty matrix (lambda.L * L + lambda.2 * I) is not positive definite. lambda.2 is adjusted to ", round(lambda.2, 5), " to make it positive definite.", sep = ""))
   }
   
   betahat <- c(solve(t(X) %*% X + lambda.L * L + lambda.2 * diag(p)) %*% t(X) %*% Y)   # Grace coefficient estimate

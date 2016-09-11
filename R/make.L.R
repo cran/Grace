@@ -1,4 +1,4 @@
-# This function constructs the graph Laplacian matrices from adjacency matrices
+# This function constructs graph Laplacian matrices from adjacency matrices
 # Author: Sen Zhao
 # Email: sendavid7@gmail.com
 
@@ -7,7 +7,10 @@ make.L <- function(adj, normalize.Laplacian = FALSE){
     stop("Error: The adjacency matrix needs to be symmetric.")
   }
   if(max(abs(adj)) > 1){
-    stop("Error: The weight in the adjacency matrix needs to be between -1 and 1.")
+    stop("Error: Entries in the adjacency matrix need to be between -1 and 1.")
+  }
+  if(sum(abs(adj)) == 0){
+    stop("Error: Adjacency matrix is empty.")
   }
   L <- -adj
   diag(L) <- 0

@@ -6,13 +6,10 @@ cvGrace <- function(X, Y, L, lambda.L, lambda.1, lambda.2, K = 10){
   lambda.1 <- unique(sort(lambda.1, decreasing = TRUE))
   lambda.L <- unique(sort(lambda.L, decreasing = TRUE))
   lambda.2 <- unique(sort(lambda.2, decreasing = TRUE))
-  noL1 <- FALSE
-  if(sum(lambda.1 == 0) == length(lambda.1)){
-    noL1 <- TRUE
-  }
-  
-  if(length(lambda.1) == 1 | sum(lambda.1 == 0) == length(lambda.1)){
-    lambda.1 <- c(lambda.1 + 0.001, lambda.1)
+  noL1 <- ifelse(lambda.1 == 0, TRUE, FALSE)
+
+  if(length(lambda.1) == 1){
+    lambda.1 <- c(lambda.1 + 0.01, lambda.1)
   }
   p <- ncol(X)
   n <- nrow(X)
@@ -23,7 +20,8 @@ cvGrace <- function(X, Y, L, lambda.L, lambda.1, lambda.2, K = 10){
     for(i2 in 1:length(lambda.2)){
       l2 <- lambda.2[i2]
       Lnew <- lL * L + l2 * diag(p)
-      S <- eigen(Lnew)$vectors %*% sqrt(diag(eigen(Lnew)$values))
+      eL <- eigen(Lnew)
+      S <- eL$vectors %*% sqrt(diag(eL$values))
       l2star <- 1
       l1star <- lambda.1
       Xstar <- rbind(X, sqrt(l2star) * t(S)) / sqrt(1 + l2star)
@@ -32,7 +30,7 @@ cvGrace <- function(X, Y, L, lambda.L, lambda.1, lambda.2, K = 10){
       cvres <- cv.glmnet(Xstar, Ystar, lambda = gammastar, intercept = FALSE, standardize = FALSE, nfolds = K)
       lam1[iL, i2] <- which.min(abs(gammastar - cvres$lambda.min))
       if(noL1){
-        ERR[iL, i2] <- cvres$cvm[length(cvres$cvm)]
+        ERR[iL, i2] <- cvres$cvm[2]
       }else{
         ERR[iL, i2] <- cvres$cvm[lam1[iL, i2]]
       }

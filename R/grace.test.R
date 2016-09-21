@@ -21,10 +21,10 @@ grace.test <- function(Y, X, L, lambda.L, lambda.2 = 0, normalize.L = FALSE, eta
     stop("Error: Dimensions of X and L do not match.")
   }
   if(min(lambda.L) < 0 | min(lambda.2) < 0){
-    stop("Error: Grace tuning parameters must be non-negative.")
+    stop("Error: Tuning parameters must be non-negative.")
   }
-  if(min(lambda.L) == 0 & min(lambda.2) == 0){
-    stop("Error: At least one of the grace tuning parameters must be positive.")
+  if(min(lambda.L) == 0 & min(lambda.2) == 0 & length(lambda.L) == 1 & length(lambda.2) == 1){
+    stop("Error: At least one of the tuning parameters must be positive.")
   }
   
   
@@ -49,6 +49,9 @@ grace.test <- function(Y, X, L, lambda.L, lambda.2 = 0, normalize.L = FALSE, eta
     tun <- cvGrace(X, Y, L, lambda.L, 0, lambda.2, K = K)
     lambda.L <- tun[1]
     lambda.2 <- tun[3]
+    print(paste("Tuning parameters selected by ", K, "-fold cross-validation:", sep = ""))
+    print(paste("lambda.L = ", lambda.L, sep = ""))
+    print(paste("lambda.2 = ", lambda.2, sep = ""))
   }
   
   betahat <- c(solve(t(X) %*% X + lambda.L * L + lambda.2 * diag(p)) %*% t(X) %*% Y)   # Grace coefficient estimate

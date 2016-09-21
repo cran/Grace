@@ -22,10 +22,10 @@ grace <- function(Y, X, L, lambda.L, lambda.1 = 0, lambda.2 = 0, normalize.L = F
     stop("Error: Dimensions of X and L do not match.")
   }
   if(min(lambda.L) < 0 | min(lambda.2) < 0 | min(lambda.1) < 0){
-    stop("Error: Grace tuning parameters must be non-negative.")
+    stop("Error: Tuning parameters must be non-negative.")
   }
-  if(min(lambda.L) == 0 & min(lambda.2) == 0){
-    stop("Error: At least one of the grace tuning parameters must be positive.")
+  if(min(lambda.L) == 0 & min(lambda.2) == 0 & length(lambda.L) == 1 & length(lambda.2) == 1){
+    stop("Error: At least one of the tuning parameters must be positive.")
   }
   
   Y <- Y - mean(Y)  # Center Y
@@ -50,20 +50,23 @@ grace <- function(Y, X, L, lambda.L, lambda.1 = 0, lambda.2 = 0, normalize.L = F
     tun <- cvGrace(X, Y, L, lambda.L, lambda.1, lambda.2, K)
     lambda.L <- tun[1]
     lambda.1 <- tun[2]
-    lambda.2 <- tun[3]  
+    lambda.2 <- tun[3]
+    print(paste("Tuning parameters selected by ", K, "-fold cross-validation:", sep = ""))
+    print(paste("lambda.L = ", lambda.L, sep = ""))
+    print(paste("lambda.1 = ", lambda.1, sep = ""))
+    print(paste("lambda.2 = ", lambda.2, sep = ""))
   }
   
   # See Li & Li (2008) for reference
   Lnew <- lambda.L * L + lambda.2 * diag(p)
   eL <- eigen(Lnew)
   S <- eL$vectors %*% sqrt(diag(eL$values))
-  l2star <- 1
   l1star <- lambda.1
-  Xstar <- rbind(X, sqrt(l2star) * t(S)) / sqrt(1 + l2star)
+  Xstar <- rbind(X, t(S)) / sqrt(2)
   Ystar <- c(Y, rep(0, p))
-  gammastar <- l1star / sqrt(1 + l2star) / 2 / (n + p)
+  gammastar <- l1star / sqrt(2) / 2 / (n + p)
   betahatstar <- glmnet(Xstar, Ystar, lambda = gammastar, intercept = FALSE, standardize = FALSE, thresh = 1e-11)$beta[, 1]
-  betahat <- betahatstar / sqrt(1 + l2star)
+  betahat <- betahatstar / sqrt(2)
   
   truebetahat <- betahat / scale.fac  # Scale back coefficient estimate
   truealphahat <- mean(ori.Y - ori.X %*% truebetahat)

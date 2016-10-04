@@ -1,6 +1,6 @@
 # This function constructs graph Laplacian matrices from adjacency matrices
 # Author: Sen Zhao
-# Email: sendavid7@gmail.com
+# Email: sen-zhao@sen-zhao.com
 
 make.L <- function(adj, normalize.Laplacian = FALSE){
   if(isSymmetric(adj) == FALSE){

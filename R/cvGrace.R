@@ -1,6 +1,6 @@
 # This function performs cross-validation for Grace
 # Author: Sen Zhao
-# Email: sendavid7@gmail.com
+# Email: sen-zhao@sen-zhao.com
 
 cvGrace <- function(X, Y, L, lambda.L, lambda.1, lambda.2, K = 10){
   lambda.1 <- unique(sort(lambda.1, decreasing = TRUE))

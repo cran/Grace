@@ -1,6 +1,6 @@
 # This function calculates Grace coefficient estimates
 # Author: Sen Zhao
-# Email: sendavid7@gmail.com
+# Email: sen-zhao@sen-zhao.com
 
 grace <- function(Y, X, L, lambda.L, lambda.1 = 0, lambda.2 = 0, normalize.L = FALSE, K = 10){
   lambda.L <- unique(sort(lambda.L, decreasing = TRUE))

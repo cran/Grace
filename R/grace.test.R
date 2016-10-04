@@ -1,6 +1,6 @@
 # This function calculates Grace coefficients and p-values
 # Author: Sen Zhao
-# Email: sendavid7@gmail.com
+# Email: sen-zhao@sen-zhao.com
 
 grace.test <- function(Y, X, L, lambda.L, lambda.2 = 0, normalize.L = FALSE, eta = 0.05, C = 4 * sqrt(3), K = 10){
   lambda.L <- unique(sort(lambda.L, decreasing = TRUE))

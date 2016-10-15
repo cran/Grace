@@ -2,7 +2,11 @@
 # Author: Sen Zhao
 # Email: sen-zhao@sen-zhao.com
 
-grace.test <- function(Y, X, L, lambda.L, lambda.2 = 0, normalize.L = FALSE, eta = 0.05, C = 4 * sqrt(3), K = 10){
+grace.test <- function(Y, X, L = NULL, lambda.L = NULL, lambda.2 = 0, normalize.L = FALSE, eta = 0.05, C = 4 * sqrt(3), K = 10){
+  if(is.null(L)){
+    L <- matrix(0, nrow = p, ncol = p)
+    lambda.L <- 0
+  }
   lambda.L <- unique(sort(lambda.L, decreasing = TRUE))
   lambda.2 <- unique(sort(lambda.2, decreasing = TRUE))
   
@@ -27,14 +31,13 @@ grace.test <- function(Y, X, L, lambda.L, lambda.2 = 0, normalize.L = FALSE, eta
     stop("Error: At least one of the tuning parameters must be positive.")
   }
   
-  
   Y <- Y - mean(Y)  # Center Y
   n <- nrow(X)
   p <- ncol(X)
   scale.fac <- attr(scale(X), "scaled:scale")
   X <- scale(X)     # Standardize X
   
-  if(normalize.L){
+  if(normalize.L & !is.null(L)){
     diag(L)[diag(L) == 0] <- 1
     L <- diag(1 / sqrt(diag(L))) %*% L %*% diag(1 / sqrt(diag(L)))  # Normalize L
   }

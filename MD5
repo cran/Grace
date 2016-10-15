@@ -1,9 +1,9 @@
-6886ad5e2648705660c6ec29f32a6ac3 *DESCRIPTION
+08d8a45fd01f307f083b153fbaafd39d *DESCRIPTION
 38dc2f002396e86a2d4b29102da7cfd7 *NAMESPACE
 7851a32c92ecd1f3efea0f4fee6c10e4 *R/cvGrace.R
 1f53c3302b27f6f42ca75cb0672eec6c *R/grace.R
-40b2ce4855f98537375dcb28b4d780d3 *R/grace.test.R
+e82830f470afa4deec64a115a9297e9c *R/grace.test.R
 6a7d9d132c8c9ea013c92c5d18b93cb6 *R/make.L.R
 d64672a96c9847f75dda8212f0e6f95a *man/grace.Rd
-0ae97a3455a492b122def67465d27d70 *man/grace.test.Rd
+298f60f9bef140d609c717b7af248b7d *man/grace.test.Rd
 106babe2e2aa5710885079f684c6c3ea *man/make.L.Rd

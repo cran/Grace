@@ -1,6 +1,24 @@
 # This function calculates Grace coefficient estimates
 # Author: Sen Zhao
 # Email: sen-zhao@sen-zhao.com
+# ----------------------------------------------------------------------------
+# Arguments:
+# Y: n by 1 vector of the response variable.
+# X: n by p matrix of the design matrix.
+# L: p by p matrix of the penalty weight matrix.
+# lambda.L: tuning parameters of the penalty weight matrix.
+# lambda.1: tuning parameters of the L_1 penalty.
+# lambda.2: tuning parameters of the ridge penalty.
+# normalize.L: binary variable indicating whether the penalty weight matrix 
+# needs to be normalized beforehand.
+# K: number of folds in cross-validation.
+# ----------------------------------------------------------------------------
+# Outputs:
+# intercept: intercept of the linear regression model.
+# beta: regression coefficient of the linear regression model.
+
+
+
 
 grace <- function(Y, X, L, lambda.L, lambda.1 = 0, lambda.2 = 0, normalize.L = FALSE, K = 10){
   lambda.L <- unique(sort(lambda.L, decreasing = TRUE))
@@ -24,7 +42,7 @@ grace <- function(Y, X, L, lambda.L, lambda.1 = 0, lambda.2 = 0, normalize.L = F
   if(min(lambda.L) < 0 | min(lambda.2) < 0 | min(lambda.1) < 0){
     stop("Error: Tuning parameters must be non-negative.")
   }
-  if(min(lambda.L) == 0 & min(lambda.2) == 0 & length(lambda.L) == 1 & length(lambda.2) == 1){
+  if(min(lambda.L) == 0 & min(lambda.2) == 0 & min(lambda.1) == 0 & length(lambda.L) == 1 & length(lambda.2) == 1 & length(lambda.1) == 1){
     stop("Error: At least one of the tuning parameters must be positive.")
   }
   

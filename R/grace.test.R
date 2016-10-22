@@ -1,8 +1,28 @@
 # This function calculates Grace coefficients and p-values
 # Author: Sen Zhao
 # Email: sen-zhao@sen-zhao.com
+# ----------------------------------------------------------------------------
+# Arguments:
+# Y: n by 1 vector of the response variable.
+# X: n by p matrix of the design matrix.
+# L: p by p matrix of the penalty weight matrix.
+# lambda.L: tuning parameter of the penalty weight matrix.
+# lambda.1: tuning parameter of the L_1 penalty.
+# lambda.2: tuning parameter of the ridge penalty.
+# normalize.L: binary variable indicating whether the penalty weight matrix 
+# needs to be normalized beforehand.
+# K: number of folds in cross-validation.
+# sigma.error: error standard deviation. If NULL, scale lasso is applied.
+# enable.group.test: binary variable indicating whether group tests should be enabled.
+# eta, C: parameters of the grace test; see Zhao & Shojaie (2016) for reference.
+# ----------------------------------------------------------------------------
+# Outputs:
+# intercept: intercept of the linear regression model.
+# beta: regression coefficient of the linear regression model.
+# pvalue: p-value of individual hypothesis tests.
+# group.test: function to perform group-wise hypothesis tet.
 
-grace.test <- function(Y, X, L = NULL, lambda.L = NULL, lambda.2 = 0, normalize.L = FALSE, eta = 0.05, C = 4 * sqrt(3), K = 10){
+grace.test <- function(Y, X, L = NULL, lambda.L = NULL, lambda.2 = 0, normalize.L = FALSE, eta = 0.05, C = 4 * sqrt(3), K = 10, sigma.error = NULL){
   if(is.null(L)){
     L <- matrix(0, nrow = p, ncol = p)
     lambda.L <- 0
@@ -61,10 +81,15 @@ grace.test <- function(Y, X, L = NULL, lambda.L = NULL, lambda.2 = 0, normalize.
   truebetahat <- betahat / scale.fac  # Scale back coefficient estimate
   truealphahat <- mean(ori.Y - ori.X %*% truebetahat)
   
-  sig.L <- scalreg(X, Y)$hsigma   # Error standard deviation from the scaled lasso
+  if(is.null(sigma.error)){
+    sig.L <- scalreg(X, Y)$hsigma   # Error standard deviation from the scaled lasso
+  }else{
+    sig.L <- sigma.error
+  }
   lam <- sig.L * C * sqrt(log(p) / n) / 2 # Lasso initial tuning parameter
   beta.init <- glmnet(X, Y, lambda = lam, intercept = FALSE)$beta[, 1]   # Initial estimator
-  se <- sig.L * sqrt(diag(solve(t(X) %*% X + lambda.L * L + lambda.2 * diag(p)) %*% t(X) %*% X %*% solve(t(X) %*% X + lambda.L * L + lambda.2 * diag(p)))) # Standard error
+  covmatrix <- solve(t(X) %*% X + lambda.L * L + lambda.2 * diag(p)) %*% t(X) %*% X %*% solve(t(X) %*% X + lambda.L * L + lambda.2 * diag(p))
+  se <- sig.L * sqrt(diag(covmatrix)) # Standard error
   bias <- solve(t(X) %*% X + lambda.L * L + lambda.2 * diag(p)) %*% (lambda.L * L + lambda.2 * diag(p)) %*% beta.init  # Bias correction
   targ <- abs(solve(t(X) %*% X + lambda.L * L + lambda.2 * diag(p)) %*% (lambda.L * L + lambda.2 * diag(p)))
   diag(targ) <- 0
@@ -74,5 +99,19 @@ grace.test <- function(Y, X, L = NULL, lambda.L = NULL, lambda.2 = 0, normalize.
   Tstat <- (abs(teststat) - correct) * (abs(teststat) > correct)
   pval <- 2 * (1 - pnorm(abs(Tstat / se)))
   
-  return(list(intercept = truealphahat, beta = truebetahat, pvalue = pval))
+  group.testing.function <- function(group){
+    if(!is.vector(group)){
+      stop("Error: you need to supply a vector of variable indices of the group.")
+    }else if(length(group) < 2){
+      stop("Error: the size of the group needs to be at least two.")
+    }
+    test.stat = max(abs(Tstat[group] / se[group]))
+    subcovmatrix <- diag(1 / sqrt(diag(covmatrix[group, group]))) %*% covmatrix[group, group] %*% diag(1 / sqrt(diag(covmatrix[group, group])))
+    absZ <- abs(mvrnorm(n = 100000, mu = rep(0, length(group)), Sigma = subcovmatrix))
+    maxZ <- apply(absZ, 1, max)
+    groupp <- 1 - mean(test.stat > maxZ)
+    return(groupp)
+  }
+
+  return(list(intercept = truealphahat, beta = truebetahat, pvalue = pval, group.test = group.testing.function))
 }

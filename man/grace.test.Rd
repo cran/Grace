@@ -10,7 +10,8 @@
   Test for the association between Y and each column of X using the Grace test based on Zhao and Shojaie (2016).
 }
 \usage{
-  grace.test(Y,X,L = NULL,lambda.L,lambda.2=0,normalize.L=FALSE,eta=0.05,C=4*sqrt(3),K=10)
+  grace.test(Y,X,L=NULL,lambda.L=NULL,lambda.2=0,normalize.L=FALSE,
+  eta=0.05,C=4*sqrt(3),K=10,sigma.error=NULL)
 }
 \arguments{
   \item{Y}{
@@ -40,6 +41,9 @@
   \item{K}{
     number of folds in cross-validation.
   }
+  \item{sigma.error}{
+    error standard deviation. If NULL, we apply the scale the lasso to estimate it.
+  }
 }
 \details{
 This function performs the Grace test (if lambda.2 = 0), the GraceI test (if lambda.L = 0) and the GraceR test as introduced in Zhao and Shojaie (2016). The Grace tests examine the null hypothesis \eqn{\beta_j=0} conditional on all other covariates, even if the design matrix \eqn{X} has more covariates (columns) than observations (rows). Network information on associations between covariates, which is represented by the \eqn{L} matrix, could be used to improve the power of the test. When \eqn{L} is informative (see Zhao and Shojaie (2016) for details), the Grace test is expected to deliver higher power than the GraceI test and other competing methods which ignores the network information (see e.g. Buhlmann (2013), van de Geer et al. (2014), Zhang and Zhang (2014)). When \eqn{L} is potentially uninformative or inaccurate, the GraceR test could be used. Using data-adaptive choices (e.g. by cross-validation) of lambda.L and lambda.2, the GraceR test could adaptively choose the amount of outside information to be incorporated, which leads to more robust performance. Regardless of the informativeness of \eqn{L}, type-I error rates of the Grace, GraceI and GraceR tests are asymptotically controlled.
@@ -59,6 +63,7 @@ To perform the Grace tests, the lasso initial estimator is calculated using lass
   \item{intercept}{fitted intercept.}
   \item{beta}{fitted regression coefficients.}
   \item{pvalue}{p-values based on the Grace tests.}
+  \item{group.test}{function to perform the group test, with the null hypothesis being that all the regression coefficients in the group equal zero. The argument of this function needs to be a vector of variable indices. The output is the p-value of the group test.}
 }
 \references{
   Li, C., and Li, H. (2008). Network-constrained regularization and variable selection for analysis of genomic data. Bioinformatics, 24, 1175-1182.
@@ -90,13 +95,16 @@ ind <- lower.tri(L, diag = FALSE)
 L[ind] <- t(L)[ind]
 diag(L) <- -rowSums(L)
 
-beta <- eigen(L)$vectors[, p] * 10
+beta <- c(rep(1, 10), rep(0, p - 10))
 
 Sigma <- solve(L + 0.1 * diag(p))
-sigma.error <- sqrt(t(beta) \%*\% Sigma \%*\% beta) / 10
+sigma.error <- sqrt(t(beta) \%*\% Sigma \%*\% beta) / 2
 
 X <- mvrnorm(n, mu = rep(0, p), Sigma = Sigma)
 Y <- c(X \%*\% beta + rnorm(n, sd = sigma.error))
 
-grace.test(Y, X, L, lambda.L = 100, lambda.2 = 1)
+grace.test.result<-grace.test(Y,X,L,lambda.L=c(0.05, 0.1),lambda.2=c(0.05, 0.1))
+grace.test.result$pvalue
+grace.test.result$group.test(1:2)
+grace.test.result$group.test(3:50)
 }

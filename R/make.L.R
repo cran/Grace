@@ -1,6 +1,14 @@
 # This function constructs graph Laplacian matrices from adjacency matrices
 # Author: Sen Zhao
 # Email: sen-zhao@sen-zhao.com
+# ----------------------------------------------------------------------------
+# Arguments:
+# adj: p by p (weighted) adjacency matrix of a graph.
+# normalize.Laplacian: binary variable indicating whether the laplacian matrix 
+# should be normalized so that the diagonal entries equal to one.
+# ----------------------------------------------------------------------------
+# Outputs:
+# A (nromalized) laplacian matrix corresponding to the adjacency matrix.
 
 make.L <- function(adj, normalize.Laplacian = FALSE){
   if(isSymmetric(adj) == FALSE){

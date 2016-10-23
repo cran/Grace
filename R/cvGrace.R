@@ -1,20 +1,18 @@
 # This function performs cross-validation for Grace
-# Author: Sen Zhao
-# Email: sen-zhao@sen-zhao.com
-# ----------------------------------------------------------------------------
+# Author:       Sen Zhao
+# Email:        sen-zhao@sen-zhao.com
+# ----------------------------------------------------------------------------------------------
 # Arguments:
-# Y: n by 1 vector of the response variable.
-# X: n by p matrix of the design matrix.
-# L: p by p matrix of the penalty weight matrix.
-# lambda.L: tuning parameters of the penalty weight matrix.
-# lambda.1: tuning parameters of the L_1 penalty.
-# lambda.2: tuning parameters of the ridge penalty.
-# normalize.L: binary variable indicating whether the penalty weight matrix 
-# needs to be normalized beforehand.
-# K: number of folds in cross-validation.
-# ----------------------------------------------------------------------------
+# Y:            centered n by 1 vector of the response variable.
+# X:            standardized n (number of rows) by p (number of columns) design matrix.
+# L:            p by p symmetric matrix of the penalty weight matrix.
+# lambda.L:     tuning parameters of the penalty weight matrix.
+# lambda.1:     tuning parameters of the L_1 penalty.
+# lambda.2:     tuning parameters of the ridge penalty.
+# K:            number of folds in cross-validation.
+# ----------------------------------------------------------------------------------------------
 # Outputs:
-# tuning parameters by K-fold cross-validation
+#               tuning parameters by K-fold cross-validation
 
 cvGrace <- function(X, Y, L, lambda.L, lambda.1, lambda.2, K = 10){
   lambda.1 <- unique(sort(lambda.1, decreasing = TRUE))
@@ -22,7 +20,7 @@ cvGrace <- function(X, Y, L, lambda.L, lambda.1, lambda.2, K = 10){
   lambda.2 <- unique(sort(lambda.2, decreasing = TRUE))
   
   oneL1 <- (length(lambda.1) == 1)
-  noL1 <- oneL1 & (sum(lambda.1 == 0) == 1)
+  zeroL1 <- oneL1 & (sum(lambda.1 == 0) == 1)
   
   if(oneL1){
     lambda.1 <- c(lambda.1 + 0.01, lambda.1)
@@ -56,7 +54,7 @@ cvGrace <- function(X, Y, L, lambda.L, lambda.1, lambda.2, K = 10){
     }
   }
   idx <- which(ERR == min(ERR), arr.ind = TRUE)
-  if(noL1){
+  if(zeroL1){
     resl1 <- 0
   }else if(oneL1){
     resl1 <- lambda.1[2]  

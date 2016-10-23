@@ -1,21 +1,21 @@
 # This function calculates Grace coefficient estimates
-# Author: Sen Zhao
-# Email: sen-zhao@sen-zhao.com
+# Author:       Sen Zhao
+# Email:        sen-zhao@sen-zhao.com
 # ----------------------------------------------------------------------------
 # Arguments:
-# Y: n by 1 vector of the response variable.
-# X: n by p matrix of the design matrix.
-# L: p by p matrix of the penalty weight matrix.
-# lambda.L: tuning parameters of the penalty weight matrix.
-# lambda.1: tuning parameters of the L_1 penalty.
-# lambda.2: tuning parameters of the ridge penalty.
-# normalize.L: binary variable indicating whether the penalty weight matrix 
-# needs to be normalized beforehand.
-# K: number of folds in cross-validation.
+# Y:            centered n by 1 vector of the response variable.
+# X:            standardized n (number of rows) by p (number of columns) design matrix.
+# L:            p by p symmetric matrix of the penalty weight matrix.
+# lambda.L:     tuning parameters of the penalty weight matrix.
+# lambda.1:     tuning parameters of the L_1 penalty.
+# lambda.2:     tuning parameters of the ridge penalty.
+# normalize.L:  binary parameter indicating whether the penalty weight matrix 
+#               needs to be normalized beforehand.
+# K:            number of folds in cross-validation.
 # ----------------------------------------------------------------------------
 # Outputs:
-# intercept: intercept of the linear regression model.
-# beta: regression coefficient of the linear regression model.
+# intercept:    intercept of the linear regression model.
+# beta:         regression coefficients (slopes) of the linear regression model.
 
 
 
@@ -45,22 +45,30 @@ grace <- function(Y, X, L, lambda.L, lambda.1 = 0, lambda.2 = 0, normalize.L = F
   if(min(lambda.L) == 0 & min(lambda.2) == 0 & min(lambda.1) == 0 & length(lambda.L) == 1 & length(lambda.2) == 1 & length(lambda.1) == 1){
     stop("Error: At least one of the tuning parameters must be positive.")
   }
+
+  # ----------------------
+  # | Data Preprocessing |
+  # ----------------------
   
-  Y <- Y - mean(Y)  # Center Y
+  Y <- Y - mean(Y)
   n <- nrow(X)
   p <- ncol(X)
   scale.fac <- attr(scale(X), "scaled:scale")
-  X <- scale(X)     # Standardize X
+  X <- scale(X)
   
   if(normalize.L){
     diag(L)[diag(L) == 0] <- 1
     L <- diag(1 / sqrt(diag(L))) %*% L %*% diag(1 / sqrt(diag(L)))  # Normalize L
   }
   
-  emin <- min(eigen(min(lambda.L) * L + min(lambda.2) * diag(p))$values)  # Minimum eigenvalue of the penalty weight matrix
+  emin <- min(eigen(min(lambda.L) * L + min(lambda.2) * diag(p))$values)
   if(emin < 1e-5){
     stop("Error: The penalty matrix (lambda.L * L + lambda.2 * I) is not always positive definite for all tuning parameters. Consider increase the value of lambda.2.")
   }
+  
+  # --------------------------------------------------------
+  # | Grace Estimation: see Li and Li (2008) for reference |
+  # --------------------------------------------------------
   
 
   # If more than one tuning parameter is provided, perform K-fold cross-validation  
@@ -75,7 +83,6 @@ grace <- function(Y, X, L, lambda.L, lambda.1 = 0, lambda.2 = 0, normalize.L = F
     print(paste("lambda.2 = ", lambda.2, sep = ""))
   }
   
-  # See Li & Li (2008) for reference
   Lnew <- lambda.L * L + lambda.2 * diag(p)
   eL <- eigen(Lnew)
   S <- eL$vectors %*% sqrt(diag(eL$values))

@@ -11,7 +11,13 @@
 # A (nromalized) laplacian matrix corresponding to the adjacency matrix.
 
 make.L <- function(adj, normalize.Laplacian = FALSE){
-  if(isSymmetric(adj) == FALSE){
+  if(!is.matrix(adj)){
+    stop("Error: adj needs to be a matrix")
+  }
+  if(nrow(adj) < 2){
+    stop("Error: The adjacenecy matrix needs to have at least two rows and two columns.")
+  }
+  if(!isSymmetric(adj)){
     stop("Error: The adjacency matrix needs to be symmetric.")
   }
   if(max(abs(adj)) > 1){

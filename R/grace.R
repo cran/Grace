@@ -1,4 +1,4 @@
-# This function calculates Grace coefficient estimates
+# This function calculates Grace coefficient estimates.
 # Author:       Sen Zhao
 # Email:        sen-zhao@sen-zhao.com
 # ----------------------------------------------------------------------------
@@ -16,29 +16,20 @@
 # Outputs:
 # intercept:    intercept of the linear regression model.
 # beta:         regression coefficients (slopes) of the linear regression model.
+# ----------------------------------------------------------------------------
 
 
 
 
 grace <- function(Y, X, L, lambda.L, lambda.1 = 0, lambda.2 = 0, normalize.L = FALSE, K = 10){
+  checkdata(X, Y, L)
+  
   lambda.L <- unique(sort(lambda.L, decreasing = TRUE))
   lambda.1 <- unique(sort(lambda.1, decreasing = TRUE))
   lambda.2 <- unique(sort(lambda.2, decreasing = TRUE))
 
   ori.Y <- Y
   ori.X <- X
-  if(!is.null(ncol(Y))){
-    stop("Error: Y is not a vector.")
-  }
-  if(length(Y) != nrow(X)){
-    stop("Error: Dimensions of X and Y do not match.")
-  }
-  if(!isSymmetric(L)){
-    stop("Error: L is not a symmetric matrix.")
-  }
-  if(ncol(X) != ncol(L)){
-    stop("Error: Dimensions of X and L do not match.")
-  }
   if(min(lambda.L) < 0 | min(lambda.2) < 0 | min(lambda.1) < 0){
     stop("Error: Tuning parameters must be non-negative.")
   }

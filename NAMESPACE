@@ -1,3 +1,3 @@
-export(make.L, grace, grace.test)
+export(make.L, grace, grace.test, graceI.test)
 import(MASS, glmnet, scalreg)
 importFrom("stats", "pnorm", "p.adjust")

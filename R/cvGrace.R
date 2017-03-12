@@ -1,7 +1,7 @@
-# This function performs cross-validation for Grace
+# This function performs cross-validation for Grace.
 # Author:       Sen Zhao
 # Email:        sen-zhao@sen-zhao.com
-# ----------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Arguments:
 # Y:            centered n by 1 vector of the response variable.
 # X:            standardized n (number of rows) by p (number of columns) design matrix.
@@ -10,23 +10,25 @@
 # lambda.1:     tuning parameters of the L_1 penalty.
 # lambda.2:     tuning parameters of the ridge penalty.
 # K:            number of folds in cross-validation.
-# ----------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Outputs:
 #               tuning parameters by K-fold cross-validation
 
 cvGrace <- function(X, Y, L, lambda.L, lambda.1, lambda.2, K = 10){
+  checkdata(X, Y, L)
+  p <- ncol(X)
+  n <- nrow(X)
+  
   lambda.1 <- unique(sort(lambda.1, decreasing = TRUE))
   lambda.L <- unique(sort(lambda.L, decreasing = TRUE))
   lambda.2 <- unique(sort(lambda.2, decreasing = TRUE))
   
   oneL1 <- (length(lambda.1) == 1)
-  zeroL1 <- oneL1 & (sum(lambda.1 == 0) == 1)
+  zeroL1 <- oneL1 & (lambda.1 == 0)
   
   if(oneL1){
     lambda.1 <- c(lambda.1 + 0.01, lambda.1)
   }
-  p <- ncol(X)
-  n <- nrow(X)
   lam1 <- matrix(nrow = length(lambda.L), ncol = length(lambda.2))
   ERR <- matrix(NA, nrow = length(lambda.L), ncol = length(lambda.2))
   for(iL in 1:length(lambda.L)){

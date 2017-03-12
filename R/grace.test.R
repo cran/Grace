@@ -1,13 +1,12 @@
-# This function calculates Grace coefficients and p-values
+# This function calculates Grace coefficients and p-values.
 # Author:             Sen Zhao
 # Email:              sen-zhao@sen-zhao.com
-# ----------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Arguments:
 # Y:                  n by 1 vector of the response variable.
 # X:                  n (number of rows) by p (number of columns) design matrix.
 # L:                  p by p symmetric matrix of the penalty weight matrix.
 # lambda.L:           tuning parameters of the penalty weight matrix.
-# lambda.1:           tuning parameters of the L_1 penalty.
 # lambda.2:           tuning parameters of the ridge penalty.
 # normalize.L:        binary parameter indicating whether the penalty weight matrix 
 #                     needs to be normalized beforehand.
@@ -15,7 +14,7 @@
 # sigma.error:        error standard deviation. If NULL, scaled lasso is applied.
 # enable.group.test:  binary parameter indicating whether group tests should be enabled.
 # eta, C:             parameters of the grace test; see Zhao & Shojaie (2016) for reference.
-# ----------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Outputs:
 # intercept:          intercept of the linear regression model.
 # beta:               regression coefficients (slopes) of the linear regression model.
@@ -23,6 +22,10 @@
 # group.test:         function to perform group-wise hypothesis test.
 
 grace.test <- function(Y, X, L = NULL, lambda.L = NULL, lambda.2 = 0, normalize.L = FALSE, eta = 0.05, C = 4 * sqrt(3), K = 10, sigma.error = NULL){
+  checkdata(X, Y, L)
+  
+  n <- nrow(X)
+  p <- ncol(X)
   if(is.null(L)){
     L <- matrix(0, nrow = p, ncol = p)
     lambda.L <- 0
@@ -32,18 +35,6 @@ grace.test <- function(Y, X, L = NULL, lambda.L = NULL, lambda.2 = 0, normalize.
   
   ori.Y <- Y
   ori.X <- X
-  if(!is.null(ncol(Y))){
-    stop("Error: Y is not a vector.")
-  }
-  if(length(Y) != nrow(X)){
-    stop("Error: Dimensions of X and Y do not match.")
-  }
-  if(!isSymmetric(L)){
-    stop("Error: L is not a symmetric matrix.")
-  }
-  if(ncol(X) != ncol(L)){
-    stop("Error: Dimensions of X and L do not match.")
-  }
   if(min(lambda.L) < 0 | min(lambda.2) < 0){
     stop("Error: Tuning parameters must be non-negative.")
   }
@@ -61,9 +52,7 @@ grace.test <- function(Y, X, L = NULL, lambda.L = NULL, lambda.2 = 0, normalize.
   # | Data Preprocessing |
   # ----------------------
 
-    Y <- Y - mean(Y)
-  n <- nrow(X)
-  p <- ncol(X)
+  Y <- Y - mean(Y)
   scale.fac <- attr(scale(X), "scaled:scale")
   X <- scale(X)
   

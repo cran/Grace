@@ -14,6 +14,7 @@
 # sigma.error:        error standard deviation. If NULL, scaled lasso is applied.
 # enable.group.test:  binary parameter indicating whether group tests should be enabled.
 # eta, C:             parameters of the grace test; see Zhao & Shojaie (2016) for reference.
+# verbose:            whether computation progress should be printed.
 # ----------------------------------------------------------------------------
 # Outputs:
 # intercept:          intercept of the linear regression model.
@@ -21,7 +22,7 @@
 # pvalue:             p-values of individual hypothesis tests.
 # group.test:         function to perform group-wise hypothesis test.
 
-grace.test <- function(Y, X, L = NULL, lambda.L = NULL, lambda.2 = 0, normalize.L = FALSE, eta = 0.05, C = 4 * sqrt(3), K = 10, sigma.error = NULL){
+grace.test <- function(Y, X, L = NULL, lambda.L = NULL, lambda.2 = 0, normalize.L = FALSE, eta = 0.05, C = 4 * sqrt(3), K = 10, sigma.error = NULL, verbose = FALSE){
   checkdata(X, Y, L)
   
   n <- nrow(X)
@@ -75,9 +76,11 @@ grace.test <- function(Y, X, L = NULL, lambda.L = NULL, lambda.2 = 0, normalize.
     tun <- cvGrace(X, Y, L, lambda.L, 0, lambda.2, K = K)
     lambda.L <- tun[1]
     lambda.2 <- tun[3]
-    print(paste("Tuning parameters selected by ", K, "-fold cross-validation:", sep = ""))
-    print(paste("lambda.L = ", lambda.L, sep = ""))
-    print(paste("lambda.2 = ", lambda.2, sep = ""))
+    if(!verbose){
+      print(paste("Tuning parameters selected by ", K, "-fold cross-validation:", sep = ""))
+      print(paste("lambda.L = ", lambda.L, sep = ""))
+      print(paste("lambda.2 = ", lambda.2, sep = ""))
+    }
   }
   
   H <- solve(t(X) %*% X + lambda.L * L + lambda.2 * diag(p))

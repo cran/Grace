@@ -12,6 +12,7 @@
 # normalize.L:  binary parameter indicating whether the penalty weight matrix 
 #               needs to be normalized beforehand.
 # K:            number of folds in cross-validation.
+# verbose:      whether computation progress should be printed.
 # ----------------------------------------------------------------------------
 # Outputs:
 # intercept:    intercept of the linear regression model.
@@ -21,13 +22,13 @@
 
 
 
-grace <- function(Y, X, L, lambda.L, lambda.1 = 0, lambda.2 = 0, normalize.L = FALSE, K = 10){
+grace <- function(Y, X, L, lambda.L, lambda.1 = 0, lambda.2 = 0, normalize.L = FALSE, K = 10, verbose = FALSE){
   checkdata(X, Y, L)
   
   lambda.L <- unique(sort(lambda.L, decreasing = TRUE))
   lambda.1 <- unique(sort(lambda.1, decreasing = TRUE))
   lambda.2 <- unique(sort(lambda.2, decreasing = TRUE))
-
+  
   ori.Y <- Y
   ori.X <- X
   if(min(lambda.L) < 0 | min(lambda.2) < 0 | min(lambda.1) < 0){
@@ -36,7 +37,7 @@ grace <- function(Y, X, L, lambda.L, lambda.1 = 0, lambda.2 = 0, normalize.L = F
   if(min(lambda.L) == 0 & min(lambda.2) == 0 & min(lambda.1) == 0 & length(lambda.L) == 1 & length(lambda.2) == 1 & length(lambda.1) == 1){
     stop("Error: At least one of the tuning parameters must be positive.")
   }
-
+  
   # ----------------------
   # | Data Preprocessing |
   # ----------------------
@@ -61,17 +62,19 @@ grace <- function(Y, X, L, lambda.L, lambda.1 = 0, lambda.2 = 0, normalize.L = F
   # | Grace Estimation: see Li and Li (2008) for reference |
   # --------------------------------------------------------
   
-
+  
   # If more than one tuning parameter is provided, perform K-fold cross-validation  
   if((length(lambda.L) > 1) | (length(lambda.1) > 1) | (length(lambda.2) > 1)){
     tun <- cvGrace(X, Y, L, lambda.L, lambda.1, lambda.2, K)
     lambda.L <- tun[1]
     lambda.1 <- tun[2]
     lambda.2 <- tun[3]
-    print(paste("Tuning parameters selected by ", K, "-fold cross-validation:", sep = ""))
-    print(paste("lambda.L = ", lambda.L, sep = ""))
-    print(paste("lambda.1 = ", lambda.1, sep = ""))
-    print(paste("lambda.2 = ", lambda.2, sep = ""))
+    if(!verbose){
+      print(paste("Tuning parameters selected by ", K, "-fold cross-validation:", sep = ""))
+      print(paste("lambda.L = ", lambda.L, sep = ""))
+      print(paste("lambda.1 = ", lambda.1, sep = ""))
+      print(paste("lambda.2 = ", lambda.2, sep = ""))
+    }
   }
   
   Lnew <- lambda.L * L + lambda.2 * diag(p)

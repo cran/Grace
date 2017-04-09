@@ -10,7 +10,7 @@
   Test for the association between Y and each column of X using the GraceI test based on Zhao and Shojaie (2016).
 }
 \usage{
-  graceI.test(Y, X, lambda.2, eta = 0.05, C = 4 * sqrt(3), K = 10, sigma.error = NULL)
+  graceI.test(Y,X,lambda.2,eta=0.05,C=4*sqrt(3),K=10,sigma.error=NULL,verbose=FALSE)
 }
 \arguments{
   \item{Y}{
@@ -33,6 +33,9 @@
   }
   \item{sigma.error}{
     error standard deviation. If NULL, scaled lasso is then applied to estimate it.
+  }
+  \item{verbose}{
+    whether computation progress should be printed.
   }
 }
 \details{

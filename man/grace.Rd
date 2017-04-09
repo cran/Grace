@@ -10,7 +10,7 @@
   Calculate coefficient estimates of Grace based on methods described in Li and Li (2008).
 }
 \usage{
-  grace(Y, X, L, lambda.L, lambda.1 = 0, lambda.2 = 0, normalize.L = FALSE, K = 10)
+  grace(Y, X, L, lambda.L, lambda.1=0, lambda.2=0, normalize.L=FALSE, K=10, verbose=FALSE)
 }
 \arguments{
   \item{Y}{
@@ -36,6 +36,9 @@
   }
   \item{K}{
     number of folds in cross-validation.
+  }
+  \item{verbose}{
+    whether computation progress should be printed.
   }
 }
 \details{

@@ -11,6 +11,7 @@
 # sigma.error:        error standard deviation. If NULL, scaled lasso is applied.
 # enable.group.test:  binary parameter indicating whether group tests should be enabled.
 # eta, C:             parameters of the grace test; see Zhao & Shojaie (2016) for reference.
+# verbose:            whether computation progress should be printed.
 # ----------------------------------------------------------------------------------------------
 # Outputs:
 # intercept:          intercept of the linear regression model.
@@ -20,7 +21,7 @@
 # ----------------------------------------------------------------------------------------------
 
 
-graceI.test <- function(Y, X, lambda.2, eta = 0.05, C = 4 * sqrt(3), K = 10, sigma.error = NULL){
-  graceI.result <- grace.test(Y = Y, X = X, lambda.2 = lambda.2, eta = eta, C = C, K = K, sigma.error = sigma.error)
+graceI.test <- function(Y, X, lambda.2, eta = 0.05, C = 4 * sqrt(3), K = 10, sigma.error = NULL, verbose = FALSE){
+  graceI.result <- grace.test(Y = Y, X = X, lambda.2 = lambda.2, eta = eta, C = C, K = K, sigma.error = sigma.error, verbose = verbose)
   return(graceI.result)
 }

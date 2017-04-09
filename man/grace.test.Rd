@@ -10,8 +10,8 @@
   Test for the association between Y and each column of X using the Grace test based on Zhao and Shojaie (2016).
 }
 \usage{
-  grace.test(Y, X, L = NULL, lambda.L = NULL, lambda.2 = 0, normalize.L = FALSE,
-  eta = 0.05, C = 4 * sqrt(3), K = 10, sigma.error = NULL)
+  grace.test(Y, X, L=NULL, lambda.L=NULL, lambda.2=0, normalize.L=FALSE,
+  eta=0.05, C=4*sqrt(3), K=10, sigma.error=NULL, verbose=FALSE)
 }
 \arguments{
   \item{Y}{
@@ -43,6 +43,9 @@
   }
   \item{sigma.error}{
     error standard deviation. If NULL, scaled lasso is then applied to estimate it.
+  }
+  \item{verbose}{
+    whether computation progress should be printed
   }
 }
 \details{
@@ -112,7 +115,7 @@ grace.test.result$group.test(3:50)
 grace.test.result$group.test(11:100)
 grace.test.result$group.test(1:5, method = "max")
 
-grace.test.result <- grace.test(Y, X, L, lambda.L = c(0.08, 0.12),
-                                lambda.2 = c(0.08, 0.12), C = "cv")
+grace.test.result <- grace.test(Y, X, L, lambda.L = 0.08,
+                                lambda.2 = 0.08, C = "cv")
 mean(grace.test.result$pvalue[beta == 0] < 0.05)
 }
